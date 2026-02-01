@@ -133,6 +133,7 @@ function App() {
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
+        compress: true, // Enable PDF compression
       });
 
       const pageWidth = 210; // A4 width in mm
@@ -141,13 +142,14 @@ function App() {
       const contentWidth = pageWidth - (2 * margin);
       const pageContentHeight = pageHeight - (2 * margin);
       
-      // Capture the entire resume
+      // Capture the entire resume with optimized settings for smaller file size
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5, // Reduced from 2 to 1.5 for smaller file size while maintaining quality
         useCORS: true,
         logging: false,
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
+        backgroundColor: '#ffffff', // Ensure white background
       });
 
       const imgWidth = contentWidth;
@@ -249,16 +251,19 @@ function App() {
             sourceWidthPx, sourceHeightPx
           );
           
-          const pageImgData = pageCanvas.toDataURL('image/png');
+          // Use JPEG with compression instead of PNG for much smaller file size
+          const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.85); // 0.85 quality provides good balance
           const displayHeight = sourceHeight * scale;
           
           pdf.addImage(
             pageImgData,
-            'PNG',
+            'JPEG',
             margin,
             margin,
             scaledWidth,
-            displayHeight
+            displayHeight,
+            undefined,
+            'FAST' // Use FAST compression for smaller file size
           );
         }
 
