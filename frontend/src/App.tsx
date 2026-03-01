@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import type { ResumeData, TemplateType } from './types/resume';
 import { ResumeEditor } from './components/ResumeEditor/ResumeEditor';
 import { ResumePreview } from './components/ResumePreview/ResumePreview';
-import { FaDownload, FaFileAlt, FaSave, FaCheckCircle } from 'react-icons/fa';
+import { ResumeUpload } from './components/ResumeUpload/ResumeUpload';
+import { FaDownload, FaFileAlt, FaSave, FaCheckCircle, FaFileWord } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
+import { generateWordDocument } from './utils/wordExport';
 import './App.css';
 
 const initialData: ResumeData = {
@@ -115,12 +117,46 @@ function App() {
     setResumeData(data);
   };
 
+  const handleUploadedData = (parsedData: ResumeData) => {
+    // Merge parsed data with existing data, giving preference to parsed data
+    setResumeData({
+      personalInfo: {
+        ...resumeData.personalInfo,
+        ...parsedData.personalInfo,
+      },
+      summary: parsedData.summary || resumeData.summary,
+      experience: parsedData.experience.length > 0 ? parsedData.experience : resumeData.experience,
+      education: parsedData.education.length > 0 ? parsedData.education : resumeData.education,
+      skills: parsedData.skills.length > 0 ? parsedData.skills : resumeData.skills,
+      certifications: parsedData.certifications && parsedData.certifications.length > 0 
+        ? parsedData.certifications 
+        : resumeData.certifications,
+      projects: parsedData.projects && parsedData.projects.length > 0 
+        ? parsedData.projects 
+        : resumeData.projects,
+    });
+  };
+
   const templates: { value: TemplateType; label: string; description: string }[] = [
     { value: 'modern', label: 'Modern', description: 'Clean and contemporary design' },
     { value: 'classic', label: 'Classic', description: 'Traditional professional layout' },
     { value: 'minimal', label: 'Minimal', description: 'Simple and elegant' },
     { value: 'creative', label: 'Creative', description: 'Unique sidebar layout' },
+    { value: 'professional', label: 'Professional', description: 'Two-column with gray sidebar' },
   ];
+
+  const handleDownloadWord = async () => {
+    setDownloading(true);
+    try {
+      await generateWordDocument(resumeData, selectedTemplate);
+    } catch (error) {
+      console.error('Error generating Word document:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to generate Word document: ${errorMessage}\n\nPlease check the browser console for details.`);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     setDownloading(true);
@@ -295,8 +331,28 @@ function App() {
         </div>
       </header>
 
+      {/* Template Selector at Top */}
+      <div className="top-template-selector">
+        <div className="template-selector-wrapper">
+          <label className="control-label">Choose Template:</label>
+          <div className="template-grid">
+            {templates.map((template) => (
+              <button
+                key={template.value}
+                onClick={() => setSelectedTemplate(template.value)}
+                className={`template-btn ${selectedTemplate === template.value ? 'active' : ''}`}
+              >
+                <strong>{template.label}</strong>
+                <span className="template-desc">{template.description}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="app-container">
         <div className="editor-panel">
+          <ResumeUpload onDataParsed={handleUploadedData} />
           <ResumeEditor 
             data={resumeData} 
             onChange={handleDataChange} 
@@ -328,22 +384,6 @@ function App() {
               </div>
             )}
 
-            <div className="template-selector">
-              <label className="control-label">Choose Template:</label>
-              <div className="template-grid">
-                {templates.map((template) => (
-                  <button
-                    key={template.value}
-                    onClick={() => setSelectedTemplate(template.value)}
-                    className={`template-btn ${selectedTemplate === template.value ? 'active' : ''}`}
-                  >
-                    <strong>{template.label}</strong>
-                    <span className="template-desc">{template.description}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <button
               onClick={handleDownloadPDF}
               disabled={downloading || !resumeData.personalInfo.fullName}
@@ -351,6 +391,15 @@ function App() {
             >
               <FaDownload />
               {downloading ? 'Generating PDF...' : 'Download as PDF'}
+            </button>
+
+            <button
+              onClick={handleDownloadWord}
+              disabled={downloading || !resumeData.personalInfo.fullName}
+              className="download-btn download-word-btn"
+            >
+              <FaFileWord />
+              {downloading ? 'Generating Word...' : 'Download as Word'}
             </button>
           </div>
 

@@ -4,6 +4,7 @@ import { ModernTemplate } from '../templates/ModernTemplate';
 import { ClassicTemplate } from '../templates/ClassicTemplate';
 import { MinimalTemplate } from '../templates/MinimalTemplate';
 import { CreativeTemplate } from '../templates/CreativeTemplate';
+import { ProfessionalTemplate } from '../templates/ProfessionalTemplate';
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -21,6 +22,8 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({ data, template }) 
         return <MinimalTemplate data={data} />;
       case 'creative':
         return <CreativeTemplate data={data} />;
+      case 'professional':
+        return <ProfessionalTemplate data={data} />;
       default:
         return <ModernTemplate data={data} />;
     }

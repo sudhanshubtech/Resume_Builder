@@ -1,4 +1,4 @@
-export type TemplateType = 'modern' | 'classic' | 'minimal' | 'creative';
+export type TemplateType = 'modern' | 'classic' | 'minimal' | 'creative' | 'professional';
 
 export type PersonalInfo = {
   fullName: string;

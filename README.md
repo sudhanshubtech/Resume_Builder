@@ -9,7 +9,20 @@ A modern, feature-rich resume builder with AI-powered content optimization, mult
 
 ## ✨ Features
 
-### 🔄 Auto-Save & Auto-Load (NEW!)
+### 📤 Resume Upload & Auto-Fill (NEW!)
+- **Upload Existing Resumes**: Import your current resume in PDF or Word format
+- **Intelligent Parsing**: Automatically extracts personal info, experience, education, skills, and more
+- **AI-Powered Option**: Use OpenAI for highly accurate parsing (optional)
+- **Drag & Drop**: Beautiful drag-and-drop interface with visual feedback
+- **Time Saver**: Skip manual data entry - just upload and edit
+
+### 📥 Multiple Export Formats (NEW!)
+- **PDF Export**: Generate professional PDF resumes with optimized layouts
+- **Word Export**: Download as .docx format for easy manual editing
+- **Page Break Control**: Ensures sections don't split awkwardly across pages
+- **Manual Editing**: Word format allows you to fix any layout issues manually
+
+### 🔄 Auto-Save & Auto-Load
 - **Automatic Saving**: Your resume saves when you exit each field
 - **Backup Save**: Also saves 30 seconds after you stop typing
 - **Email-Based**: Data is saved and loaded using your email address
@@ -21,6 +34,7 @@ A modern, feature-rich resume builder with AI-powered content optimization, mult
 - **Classic**: Traditional professional layout for conservative industries
 - **Minimal**: Simple and elegant typography-focused design
 - **Creative**: Unique sidebar layout with gradient styling
+- **Professional**: Two-column layout with gray sidebar (NEW!)
 
 ### 🤖 AI-Powered Optimization
 - Optimize professional summary with AI
@@ -131,43 +145,56 @@ OPENAI_API_KEY=your_api_key_here
 
 ## 📖 Usage Guide
 
-### 1. Enter Personal Information
+### 1. Upload Existing Resume (Optional)
+- **NEW!** Upload your current resume in PDF or Word format
+- Drag and drop or click to select your resume file
+- The app will automatically extract and fill in your information
+- Review and edit the auto-filled data as needed
+- See [UPLOAD_FEATURE_GUIDE.md](./UPLOAD_FEATURE_GUIDE.md) for details
+
+### 2. Enter Personal Information
 - Fill in your name, email, phone, and location
 - **Important**: Enter a valid email address to enable auto-save
 - Add optional links (LinkedIn, GitHub, Portfolio)
 - Your data will automatically save and load based on your email
 
-### 2. Write Professional Summary
+### 3. Write Professional Summary
 - Craft a compelling summary of your professional background
 - Click "Optimize with AI" to enhance it
 
-### 3. Add Work Experience
+### 4. Add Work Experience
 - Click "Add Experience" to create entries
 - Fill in position, company, dates, and description
 - Use the optimize button for each description
 - Check "Currently working here" for current roles
 
-### 4. Add Education
+### 5. Add Education
 - Include your degrees, institutions, and dates
 - Optionally add GPA
 
-### 5. List Skills
+### 6. List Skills
 - Enter comma-separated skills
 - They'll appear as professional tags
 
-### 6. Add Projects & Certifications (Optional)
+### 7. Add Projects & Certifications (Optional)
 - Showcase relevant projects with tech stacks
 - Include professional certifications
 
-### 7. Choose Template
+### 8. Choose Template
 - Select from 4 professional templates
 - Preview updates in real-time
 
-### 8. Download PDF
-- Click "Download as PDF"
-- High-quality PDF generated instantly
+### 9. Download Your Resume
+- **PDF Format**: Click "Download as PDF" for a professional PDF version
+- **Word Format**: Click "Download as Word" for an editable .docx file
+- **Word format benefits**:
+  - Easy manual editing and formatting adjustments
+  - Compatible with all word processors (MS Word, Google Docs, etc.)
+  - Full control over page breaks and section placement
+  - Can be further customized to your specific needs
+- High-quality exports generated instantly
 
-### 9. Resume Persistence
+### 10. Resume Persistence
 - Your resume automatically saves as you type
 - Return anytime - just enter the same email
 - Data persists between sessions
@@ -186,6 +213,7 @@ OPENAI_API_KEY=your_api_key_here
 - **Classic**: Finance, law, academic positions
 - **Minimal**: Design, writing, consulting
 - **Creative**: Marketing, UX/UI, project management
+- **Professional**: Corporate, executive, business development
 
 ## 📁 Project Structure
 
@@ -286,6 +314,7 @@ Built with ❤️ for helping professionals create amazing resumes.
 ## 🌟 Features Roadmap
 
 - [x] Auto-save & auto-load resume data
+- [x] Resume upload & auto-fill (PDF and Word formats)
 - [ ] Multiple resume versions per email
 - [ ] Export/Import JSON data
 - [ ] More template options
