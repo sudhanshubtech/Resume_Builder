@@ -3,6 +3,7 @@ import type { ResumeData, TemplateType } from './types/resume';
 import { ResumeEditor } from './components/ResumeEditor/ResumeEditor';
 import { ResumePreview } from './components/ResumePreview/ResumePreview';
 import { ResumeUpload } from './components/ResumeUpload/ResumeUpload';
+import { ATSScoreBanner } from './components/ATSScore/ATSScoreBanner';
 import { FaDownload, FaFileAlt, FaSave, FaCheckCircle, FaFileWord } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -330,6 +331,8 @@ function App() {
           <p className="tagline">Create stunning resumes with AI-powered optimization</p>
         </div>
       </header>
+
+      <ATSScoreBanner data={resumeData} />
 
       {/* Template Selector at Top */}
       <div className="top-template-selector">

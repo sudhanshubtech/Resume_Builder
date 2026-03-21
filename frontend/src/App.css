@@ -145,15 +145,16 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   max-width: 1800px;
-  margin: 1rem auto;
-  padding: 0 1rem;
+  margin: 0 auto;
+  padding: 1rem;
   flex: 1;
+  height: calc(100vh - 60px);
+  overflow: hidden;
 }
 
 /* Editor Panel */
 .editor-panel {
   overflow-y: auto;
-  max-height: calc(100vh - 180px);
   padding-right: 1rem;
 }
 
@@ -378,9 +379,7 @@ body {
 
 /* Preview Panel */
 .preview-panel {
-  position: sticky;
-  top: 2rem;
-  height: fit-content;
+  overflow-y: auto;
 }
 
 .preview-controls {
@@ -1129,18 +1128,172 @@ body {
   font-size: 0.75rem;
 }
 
+/* Skills Input Component */
+.skills-input-container {
+  position: relative;
+}
+
+.skills-input-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  min-height: 44px;
+  cursor: text;
+  transition: all 0.2s;
+}
+
+.skills-input-wrapper:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+  color: var(--primary-color);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  animation: chipIn 0.2s ease-out;
+}
+
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.skill-chip-text {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 0.125rem;
+  border-radius: 50%;
+  font-size: 0.625rem;
+  line-height: 1;
+  opacity: 0.6;
+  transition: all 0.15s;
+}
+
+.skill-chip-remove:hover {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--danger-color);
+}
+
+.skills-text-input {
+  flex: 1;
+  min-width: 150px;
+  border: none;
+  outline: none;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.skills-text-input::placeholder {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.skills-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 50;
+  animation: dropdownIn 0.15s ease-out;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skills-suggestion-item {
+  padding: 0.625rem 0.875rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.skills-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.skills-suggestion-item:hover,
+.skills-suggestion-item.highlighted {
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--primary-color);
+}
+
+.skills-suggestion-item strong {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.skills-count {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
 /* Responsive Design */
 @media (max-width: 1400px) {
   .app-container {
     grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
   }
 
+  .editor-panel,
   .preview-panel {
-    position: static;
-  }
-
-  .editor-panel {
-    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
   }
 }
 
@@ -1172,21 +1325,25 @@ body {
 }
 
 /* Scrollbar Styling */
-.editor-panel::-webkit-scrollbar {
+.editor-panel::-webkit-scrollbar,
+.preview-panel::-webkit-scrollbar {
   width: 8px;
 }
 
-.editor-panel::-webkit-scrollbar-track {
+.editor-panel::-webkit-scrollbar-track,
+.preview-panel::-webkit-scrollbar-track {
   background: var(--bg-secondary);
   border-radius: 4px;
 }
 
-.editor-panel::-webkit-scrollbar-thumb {
+.editor-panel::-webkit-scrollbar-thumb,
+.preview-panel::-webkit-scrollbar-thumb {
   background: var(--text-secondary);
   border-radius: 4px;
 }
 
-.editor-panel::-webkit-scrollbar-thumb:hover {
+.editor-panel::-webkit-scrollbar-thumb:hover,
+.preview-panel::-webkit-scrollbar-thumb:hover {
   background: var(--text-primary);
 }
 

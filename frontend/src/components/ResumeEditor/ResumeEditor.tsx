@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { ResumeData, Experience, Education, Certification, Project } from '../../types/resume';
 import { FaPlus, FaTrash, FaMagic } from 'react-icons/fa';
 import axios from 'axios';
+import { SkillsInput } from '../SkillsInput/SkillsInput';
 
 interface ResumeEditorProps {
   data: ResumeData;
@@ -27,8 +28,7 @@ export const ResumeEditor: React.FC<ResumeEditorProps> = ({ data, onChange, onEm
     onChange({ ...data, summary: value });
   };
 
-  const handleSkillsChange = (value: string) => {
-    const skills = value.split(',').map(s => s.trim()).filter(Boolean);
+  const handleSkillsChange = (skills: string[]) => {
     onChange({ ...data, skills });
   };
 
@@ -408,13 +408,10 @@ export const ResumeEditor: React.FC<ResumeEditorProps> = ({ data, onChange, onEm
       {/* Skills */}
       <section className="editor-section">
         <h3 className="section-header">Skills</h3>
-        <textarea
-          placeholder="Enter skills separated by commas (e.g., JavaScript, React, Node.js)"
-          value={data.skills.join(', ')}
-          onChange={(e) => handleSkillsChange(e.target.value)}
+        <SkillsInput
+          skills={data.skills}
+          onChange={handleSkillsChange}
           onBlur={onFieldBlur}
-          className="form-textarea"
-          rows={3}
         />
       </section>
 
