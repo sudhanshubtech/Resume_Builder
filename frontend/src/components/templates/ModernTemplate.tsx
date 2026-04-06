@@ -26,17 +26,17 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
         <div className="social-links">
           {data.personalInfo.linkedin && (
             <a href={data.personalInfo.linkedin} target="_blank" rel="noopener noreferrer">
-              <FaLinkedin /> {data.personalInfo.linkedin}
+              <FaLinkedin /> LinkedIn
             </a>
           )}
           {data.personalInfo.github && (
             <a href={data.personalInfo.github} target="_blank" rel="noopener noreferrer">
-              <FaGithub /> {data.personalInfo.github}
+              <FaGithub /> GitHub
             </a>
           )}
           {data.personalInfo.portfolio && (
             <a href={data.personalInfo.portfolio} target="_blank" rel="noopener noreferrer">
-              <FaGlobe /> {data.personalInfo.portfolio}
+              <FaGlobe /> Portfolio
             </a>
           )}
         </div>
@@ -56,6 +56,18 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
           <h2 className="section-title">Skills</h2>
           <div className="skills-list">
             {data.skills.map((skill, index) => (
+              <span key={index} className="skill-tag">{skill}</span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Soft Skills */}
+      {data.softSkills && data.softSkills.length > 0 && (
+        <section className="section">
+          <h2 className="section-title">Soft Skills</h2>
+          <div className="skills-list">
+            {data.softSkills.map((skill, index) => (
               <span key={index} className="skill-tag">{skill}</span>
             ))}
           </div>
@@ -117,7 +129,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data }) => {
               </div>
               {project.link && (
                 <a href={project.link} className="project-link" target="_blank" rel="noopener noreferrer">
-                  {project.link}
+                  View Project
                 </a>
               )}
             </div>

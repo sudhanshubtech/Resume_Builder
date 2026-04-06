@@ -22,14 +22,14 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
           <div className="links-classic">
             {data.personalInfo.linkedin && (
               <a href={data.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                {data.personalInfo.linkedin}
+                LinkedIn
               </a>
             )}
             {data.personalInfo.github && (
               <>
                 {data.personalInfo.linkedin && <span> | </span>}
                 <a href={data.personalInfo.github} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                  {data.personalInfo.github}
+                  GitHub
                 </a>
               </>
             )}
@@ -37,7 +37,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
               <>
                 {(data.personalInfo.linkedin || data.personalInfo.github) && <span> | </span>}
                 <a href={data.personalInfo.portfolio} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                  {data.personalInfo.portfolio}
+                  Portfolio
                 </a>
               </>
             )}
@@ -60,6 +60,14 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
         <section className="section-classic">
           <h2 className="section-title-classic">SKILLS</h2>
           <p className="skills-classic">{data.skills.join(' • ')}</p>
+        </section>
+      )}
+
+      {/* Soft Skills */}
+      {data.softSkills && data.softSkills.length > 0 && (
+        <section className="section-classic">
+          <h2 className="section-title-classic">SOFT SKILLS</h2>
+          <p className="skills-classic">{data.softSkills.join(' • ')}</p>
         </section>
       )}
 
@@ -115,7 +123,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data }) => {
               {project.link && (
                 <p className="link-classic">
                   <a href={project.link} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'underline'}}>
-                    {project.link}
+                    View Project
                   </a>
                 </p>
               )}

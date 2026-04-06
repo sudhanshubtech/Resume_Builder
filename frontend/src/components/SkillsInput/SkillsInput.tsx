@@ -5,6 +5,8 @@ interface SkillsInputProps {
   skills: string[];
   onChange: (skills: string[]) => void;
   onBlur?: () => void;
+  placeholder?: string;
+  suggestions?: string[];
 }
 
 const SUGGESTED_SKILLS = [
@@ -117,7 +119,7 @@ const SUGGESTED_SKILLS = [
   'Certified Kubernetes Administrator',
 ];
 
-export const SkillsInput: React.FC<SkillsInputProps> = ({ skills, onChange, onBlur }) => {
+export const SkillsInput: React.FC<SkillsInputProps> = ({ skills, onChange, onBlur, placeholder, suggestions }) => {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -125,8 +127,9 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({ skills, onChange, onBl
   const containerRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
+  const suggestionList = suggestions || SUGGESTED_SKILLS;
   const filteredSuggestions = inputValue.trim()
-    ? SUGGESTED_SKILLS.filter(
+    ? suggestionList.filter(
         (skill) =>
           skill.toLowerCase().includes(inputValue.toLowerCase()) &&
           !skills.some((s) => s.toLowerCase() === skill.toLowerCase())
@@ -242,7 +245,7 @@ export const SkillsInput: React.FC<SkillsInputProps> = ({ skills, onChange, onBl
             }
           }}
           onKeyDown={handleKeyDown}
-          placeholder={skills.length === 0 ? 'Type a skill and press Enter...' : 'Add more skills...'}
+          placeholder={skills.length === 0 ? (placeholder || 'Type a skill and press Enter...') : (placeholder ? `Add more...` : 'Add more skills...')}
           autoComplete="off"
         />
       </div>

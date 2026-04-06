@@ -49,19 +49,19 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data }) => {
                 {data.personalInfo.linkedin && (
                   <a href={data.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="link-item" style={{color: 'inherit', textDecoration: 'none'}}>
                     <FaLinkedin className="icon" />
-                    <span>{data.personalInfo.linkedin}</span>
+                    <span>LinkedIn</span>
                   </a>
                 )}
                 {data.personalInfo.github && (
                   <a href={data.personalInfo.github} target="_blank" rel="noopener noreferrer" className="link-item" style={{color: 'inherit', textDecoration: 'none'}}>
                     <FaGithub className="icon" />
-                    <span>{data.personalInfo.github}</span>
+                    <span>GitHub</span>
                   </a>
                 )}
                 {data.personalInfo.portfolio && (
                   <a href={data.personalInfo.portfolio} target="_blank" rel="noopener noreferrer" className="link-item" style={{color: 'inherit', textDecoration: 'none'}}>
                     <FaGlobe className="icon" />
-                    <span>{data.personalInfo.portfolio}</span>
+                    <span>Portfolio</span>
                   </a>
                 )}
               </div>
@@ -74,6 +74,18 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data }) => {
               <h3 className="sidebar-title">Skills</h3>
               <div className="skills-creative">
                 {data.skills.map((skill, index) => (
+                  <div key={index} className="skill-badge">{skill}</div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Soft Skills */}
+          {data.softSkills && data.softSkills.length > 0 && (
+            <div className="sidebar-section">
+              <h3 className="sidebar-title">Soft Skills</h3>
+              <div className="skills-creative">
+                {data.softSkills.map((skill, index) => (
                   <div key={index} className="skill-badge">{skill}</div>
                 ))}
               </div>
@@ -156,7 +168,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data }) => {
                   </div>
                   {project.link && (
                     <a href={project.link} target="_blank" rel="noopener noreferrer" style={{color: 'var(--primary-color)', textDecoration: 'none', display: 'block', marginTop: '0.5rem'}}>
-                      {project.link}
+                      View Project
                     </a>
                   )}
                 </div>

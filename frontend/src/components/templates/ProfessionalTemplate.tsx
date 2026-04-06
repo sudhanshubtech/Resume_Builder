@@ -53,7 +53,7 @@ export const ProfessionalTemplate: React.FC<TemplateProps> = ({ data }) => {
                   <div className="link-item-pro">
                     <FaLinkedin className="inline-icon-pro" />
                     <a href={data.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="link-text-pro">
-                      {data.personalInfo.linkedin.replace(/^https?:\/\//, '')}
+                      LinkedIn
                     </a>
                   </div>
                 )}
@@ -61,7 +61,7 @@ export const ProfessionalTemplate: React.FC<TemplateProps> = ({ data }) => {
                   <div className="link-item-pro">
                     <FaGithub className="inline-icon-pro" />
                     <a href={data.personalInfo.github} target="_blank" rel="noopener noreferrer" className="link-text-pro">
-                      {data.personalInfo.github.replace(/^https?:\/\//, '')}
+                      GitHub
                     </a>
                   </div>
                 )}
@@ -69,7 +69,7 @@ export const ProfessionalTemplate: React.FC<TemplateProps> = ({ data }) => {
                   <div className="link-item-pro">
                     <FaGlobe className="inline-icon-pro" />
                     <a href={data.personalInfo.portfolio} target="_blank" rel="noopener noreferrer" className="link-text-pro">
-                      {data.personalInfo.portfolio.replace(/^https?:\/\//, '')}
+                      Portfolio
                     </a>
                   </div>
                 )}
@@ -87,6 +87,26 @@ export const ProfessionalTemplate: React.FC<TemplateProps> = ({ data }) => {
               <div className="sidebar-content-pro">
                 <div className="skills-list-pro">
                   {data.skills.map((skill, index) => (
+                    <div key={index} className="skill-item-pro">
+                      <span className="skill-bullet-pro">•</span>
+                      <span>{skill}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Soft Skills in Sidebar */}
+          {data.softSkills && data.softSkills.length > 0 && (
+            <div className="sidebar-section-pro">
+              <h3 className="sidebar-title-pro">
+                <FaCode className="section-icon-pro" />
+                Soft Skills
+              </h3>
+              <div className="sidebar-content-pro">
+                <div className="skills-list-pro">
+                  {data.softSkills.map((skill, index) => (
                     <div key={index} className="skill-item-pro">
                       <span className="skill-bullet-pro">•</span>
                       <span>{skill}</span>

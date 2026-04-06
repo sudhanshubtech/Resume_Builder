@@ -18,19 +18,19 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
           <div className="links-minimal">
             {data.personalInfo.linkedin && (
               <a href={data.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                {data.personalInfo.linkedin}
+                LinkedIn
               </a>
             )}
             {data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.portfolio) && <span> • </span>}
             {data.personalInfo.github && (
               <a href={data.personalInfo.github} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                {data.personalInfo.github}
+                GitHub
               </a>
             )}
             {data.personalInfo.github && data.personalInfo.portfolio && <span> • </span>}
             {data.personalInfo.portfolio && (
               <a href={data.personalInfo.portfolio} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>
-                {data.personalInfo.portfolio}
+                Portfolio
               </a>
             )}
           </div>
@@ -49,6 +49,14 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
         <section className="section-minimal">
           <h2 className="section-title-minimal">Skills</h2>
           <p className="skills-minimal">{data.skills.join(', ')}</p>
+        </section>
+      )}
+
+      {/* Soft Skills */}
+      {data.softSkills && data.softSkills.length > 0 && (
+        <section className="section-minimal">
+          <h2 className="section-title-minimal">Soft Skills</h2>
+          <p className="skills-minimal">{data.softSkills.join(', ')}</p>
         </section>
       )}
 
@@ -106,7 +114,7 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ data }) => {
               {project.link && (
                 <div className="link-minimal">
                   <a href={project.link} target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'underline'}}>
-                    {project.link}
+                    View Project
                   </a>
                 </div>
               )}

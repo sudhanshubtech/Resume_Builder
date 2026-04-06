@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ResumeData, Experience, Education, Certification, Project } from '../../types/resume';
+import type { ResumeData, Experience, Education, Certification, Project, SkillGroup } from '../../types/resume';
 import { FaPlus, FaTrash, FaMagic } from 'react-icons/fa';
 import axios from 'axios';
 import { SkillsInput } from '../SkillsInput/SkillsInput';
@@ -28,8 +28,63 @@ export const ResumeEditor: React.FC<ResumeEditorProps> = ({ data, onChange, onEm
     onChange({ ...data, summary: value });
   };
 
+  const flattenSkillGroups = (groups: SkillGroup[]) =>
+    [...new Set(groups.flatMap((g) => g.skills.map((s) => s.trim()).filter(Boolean)))];
+
+  const handleSkillGroupsChange = (skillGroups: SkillGroup[]) => {
+    onChange({
+      ...data,
+      skillGroups,
+      skills: flattenSkillGroups(skillGroups),
+    });
+  };
+
   const handleSkillsChange = (skills: string[]) => {
     onChange({ ...data, skills });
+  };
+
+  const addSkillGroup = () => {
+    const next: SkillGroup = {
+      id: Date.now().toString(),
+      category: '',
+      skills: [],
+    };
+    handleSkillGroupsChange([...(data.skillGroups || []), next]);
+  };
+
+  const updateSkillGroup = (id: string, patch: Partial<SkillGroup>) => {
+    const groups = (data.skillGroups || []).map((g) => (g.id === id ? { ...g, ...patch } : g));
+    handleSkillGroupsChange(groups);
+  };
+
+  const removeSkillGroup = (id: string) => {
+    const prev = data.skillGroups || [];
+    const remaining = prev.filter((g) => g.id !== id);
+    if (remaining.length === 0) {
+      const flat = flattenSkillGroups(prev);
+      onChange({ ...data, skillGroups: [], skills: flat });
+    } else {
+      handleSkillGroupsChange(remaining);
+    }
+  };
+
+  const startCategorizedSkills = () => {
+    handleSkillGroupsChange([
+      {
+        id: Date.now().toString(),
+        category: '',
+        skills: [...data.skills],
+      },
+    ]);
+  };
+
+  const endCategorizedSkills = () => {
+    const flat = flattenSkillGroups(data.skillGroups || []);
+    onChange({ ...data, skillGroups: [], skills: flat.length ? flat : data.skills });
+  };
+
+  const handleSoftSkillsChange = (softSkills: string[]) => {
+    onChange({ ...data, softSkills });
   };
 
   const addExperience = () => {
@@ -408,10 +463,80 @@ export const ResumeEditor: React.FC<ResumeEditorProps> = ({ data, onChange, onEm
       {/* Skills */}
       <section className="editor-section">
         <h3 className="section-header">Skills</h3>
+        <p className="section-hint">
+          For the Executive template, use skill categories (e.g. Languages, Cloud & DevOps). Each category shows as a bold heading with skills on the line below.
+        </p>
+        {(data.skillGroups && data.skillGroups.length > 0) ? (
+          <>
+            {(data.skillGroups || []).map((group) => (
+              <div key={group.id} className="item-card skill-group-card">
+                <div className="item-header">
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Category (e.g. AI / Machine Learning, Languages)"
+                    value={group.category}
+                    onChange={(e) => updateSkillGroup(group.id, { category: e.target.value })}
+                    onBlur={onFieldBlur}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSkillGroup(group.id)}
+                    className="delete-btn"
+                    aria-label="Remove category"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+                <SkillsInput
+                  skills={group.skills}
+                  onChange={(skills) => updateSkillGroup(group.id, { skills })}
+                  onBlur={onFieldBlur}
+                />
+              </div>
+            ))}
+            <button type="button" onClick={addSkillGroup} className="add-btn">
+              <FaPlus /> Add skill category
+            </button>
+            <button type="button" onClick={endCategorizedSkills} className="secondary-action-btn">
+              Use simple skill list instead
+            </button>
+          </>
+        ) : (
+          <>
+            <SkillsInput
+              skills={data.skills}
+              onChange={handleSkillsChange}
+              onBlur={onFieldBlur}
+            />
+            <button type="button" onClick={startCategorizedSkills} className="secondary-action-btn">
+              Use skill categories (Executive layout)
+            </button>
+          </>
+        )}
+      </section>
+
+      {/* Soft Skills */}
+      <section className="editor-section">
+        <h3 className="section-header">Soft Skills (Optional)</h3>
         <SkillsInput
-          skills={data.skills}
-          onChange={handleSkillsChange}
+          skills={data.softSkills || []}
+          onChange={handleSoftSkillsChange}
           onBlur={onFieldBlur}
+          placeholder="Type a soft skill and press Enter..."
+          suggestions={[
+            'Leadership', 'Communication', 'Teamwork', 'Problem Solving', 'Critical Thinking',
+            'Time Management', 'Adaptability', 'Creativity', 'Emotional Intelligence',
+            'Conflict Resolution', 'Decision Making', 'Negotiation', 'Mentoring',
+            'Cross-functional Collaboration', 'Stakeholder Management', 'Public Speaking',
+            'Strategic Planning', 'Analytical Thinking', 'Attention to Detail',
+            'Project Management', 'Active Listening', 'Empathy', 'Work Ethic',
+            'Interpersonal Skills', 'Presentation Skills', 'Technical Writing',
+            'Coaching', 'Delegation', 'Cultural Awareness', 'Resilience',
+            'Self-Motivation', 'Accountability', 'Flexibility', 'Customer Focus',
+            'Data-driven Decision Making', 'Process Improvement', 'Innovation',
+            'Relationship Building', 'Influence', 'Persuasion',
+          ]}
         />
       </section>
 

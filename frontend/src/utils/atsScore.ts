@@ -1,4 +1,5 @@
 import type { ResumeData } from '../types/resume';
+import { getFlattenedSkills } from './resumeSkills';
 
 export interface ATSBreakdown {
   label: string;
@@ -77,7 +78,8 @@ function scoreSummary(data: ResumeData): ATSBreakdown {
     tips.push('Your summary is too short — expand it to 30-80 words');
   }
 
-  const hasKeywords = data.skills.some(
+  const flatSkills = getFlattenedSkills(data);
+  const hasKeywords = flatSkills.some(
     (skill) => summary.toLowerCase().includes(skill.toLowerCase())
   );
   if (hasKeywords) score += 4;
@@ -177,7 +179,7 @@ function scoreSkills(data: ResumeData): ATSBreakdown {
   let score = 0;
   const maxScore = 20;
   const tips: string[] = [];
-  const skills = data.skills || [];
+  const skills = getFlattenedSkills(data);
 
   if (skills.length === 0) {
     tips.push('Add relevant technical and soft skills');
@@ -216,6 +218,7 @@ function scoreExtras(data: ResumeData): ATSBreakdown {
 
   const certs = data.certifications || [];
   const projects = data.projects || [];
+  const softSkills = data.softSkills || [];
 
   if (certs.length > 0) {
     score += Math.min(certs.length, 2) * 2;
@@ -231,6 +234,14 @@ function scoreExtras(data: ResumeData): ATSBreakdown {
     if (hasDesc) score += 1;
   } else {
     tips.push('Add projects to showcase your work');
+  }
+
+  if (softSkills.length >= 3) {
+    score += 2;
+  } else if (softSkills.length > 0) {
+    score += 1;
+  } else {
+    tips.push('Add soft skills (e.g., Leadership, Communication, Teamwork)');
   }
 
   return { label: 'Extras', score: Math.min(score, maxScore), maxScore, tips };

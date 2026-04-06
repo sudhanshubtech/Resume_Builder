@@ -25,6 +25,7 @@ const initialData: ResumeData = {
   experience: [],
   education: [],
   skills: [],
+  softSkills: [],
   certifications: [],
   projects: [],
 };
@@ -129,6 +130,13 @@ function App() {
       experience: parsedData.experience.length > 0 ? parsedData.experience : resumeData.experience,
       education: parsedData.education.length > 0 ? parsedData.education : resumeData.education,
       skills: parsedData.skills.length > 0 ? parsedData.skills : resumeData.skills,
+      skillGroups:
+        parsedData.skillGroups && parsedData.skillGroups.length > 0
+          ? parsedData.skillGroups
+          : resumeData.skillGroups,
+      softSkills: parsedData.softSkills && parsedData.softSkills.length > 0
+        ? parsedData.softSkills
+        : resumeData.softSkills,
       certifications: parsedData.certifications && parsedData.certifications.length > 0 
         ? parsedData.certifications 
         : resumeData.certifications,
@@ -144,6 +152,7 @@ function App() {
     { value: 'minimal', label: 'Minimal', description: 'Simple and elegant' },
     { value: 'creative', label: 'Creative', description: 'Unique sidebar layout' },
     { value: 'professional', label: 'Professional', description: 'Two-column with gray sidebar' },
+    { value: 'executive', label: 'Executive', description: 'Clean header with right sidebar' },
   ];
 
   const handleDownloadWord = async () => {
@@ -165,120 +174,143 @@ function App() {
       const element = document.getElementById('resume-preview');
       if (!element) return;
 
-      // PDF dimensions (A4)
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
-        compress: true, // Enable PDF compression
       });
 
-      const pageWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const margin = 10; // margin in mm
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 5;
       const contentWidth = pageWidth - (2 * margin);
       const pageContentHeight = pageHeight - (2 * margin);
-      
-      // Capture the entire resume with optimized settings for smaller file size
+
+      // A4 at 96 DPI = ~794px; render at this width for correct font proportions
+      const a4WidthPx = 794;
+      const origWidth = element.style.width;
+      element.style.width = `${a4WidthPx}px`;
+
+      // Collect all link positions before capture (relative to the element)
+      const elementRect = element.getBoundingClientRect();
+      const elementScrollH = element.scrollHeight;
+      const linkAnchors = Array.from(element.querySelectorAll('a[href]'));
+      const linkData = linkAnchors
+        .map((a) => {
+          const href = a.getAttribute('href') || '';
+          if (!href || href.startsWith('#') || href.startsWith('javascript')) return null;
+          const rect = a.getBoundingClientRect();
+          return {
+            href,
+            top: rect.top - elementRect.top + element.scrollTop,
+            left: rect.left - elementRect.left,
+            width: rect.width,
+            height: rect.height,
+          };
+        })
+        .filter(Boolean) as { href: string; top: number; left: number; width: number; height: number }[];
+
       const canvas = await html2canvas(element, {
-        scale: 1.5, // Reduced from 2 to 1.5 for smaller file size while maintaining quality
+        scale: 3,
         useCORS: true,
         logging: false,
-        windowWidth: element.scrollWidth,
+        windowWidth: a4WidthPx,
         windowHeight: element.scrollHeight,
-        backgroundColor: '#ffffff', // Ensure white background
+        backgroundColor: '#ffffff',
       });
+
+      element.style.width = origWidth;
 
       const imgWidth = contentWidth;
       const imgHeight = (canvas.height * contentWidth) / canvas.width;
 
-      // Get all sections to identify good break points
-      const sections = Array.from(element.querySelectorAll('.section, .section-classic, .section-minimal, .section-creative, .header, .header-classic, .header-minimal, .creative-layout'));
-      const sectionBreakPoints: number[] = [0]; // Start of document
-      
-      // Calculate the Y position of each section in mm
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        const elementRect = element.getBoundingClientRect();
-        const relativeTop = rect.top - elementRect.top + element.scrollTop;
-        const sectionYInMm = (relativeTop / element.scrollHeight) * imgHeight;
-        
-        // Only add if it's not too close to an existing break point (at least 30mm apart)
-        const tooCloseToExisting = sectionBreakPoints.some(bp => Math.abs(bp - sectionYInMm) < 30);
-        if (!tooCloseToExisting && sectionYInMm > 20) { // Skip very early sections
-          sectionBreakPoints.push(sectionYInMm);
+      // Convert link positions from px to mm (relative to PDF content area)
+      const pxToMmX = imgWidth / a4WidthPx;
+      const pxToMmY = imgHeight / elementScrollH;
+
+      // Collect all potential break points: sections AND individual items
+      const breakSelectors = [
+        // Section-level breaks
+        '.section', '.section-classic', '.section-minimal', '.section-creative',
+        '.section-professional', '.exec-section',
+        '.header', '.header-classic', '.header-minimal',
+        '.creative-layout', '.exec-header', '.header-professional',
+        // Item-level breaks (experience, education, project, cert entries)
+        '.experience-item', '.education-item', '.project-item', '.certification-item',
+        '.item-classic', '.item-minimal',
+        '.exp-creative', '.edu-creative', '.project-creative',
+        '.experience-item-pro', '.education-item-pro', '.project-item-pro',
+        '.exec-exp-item', '.exec-edu-item', '.exec-project-item', '.exec-cert-item',
+      ].join(', ');
+
+      const elRect = element.getBoundingClientRect();
+      const breakElements = Array.from(element.querySelectorAll(breakSelectors));
+      const sectionBreakPoints: number[] = [0];
+
+      breakElements.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const relativeTop = rect.top - elRect.top + element.scrollTop;
+        const yMm = (relativeTop / element.scrollHeight) * imgHeight;
+        const tooClose = sectionBreakPoints.some(bp => Math.abs(bp - yMm) < 10);
+        if (!tooClose && yMm > 15) {
+          sectionBreakPoints.push(yMm);
         }
       });
-      
       sectionBreakPoints.sort((a, b) => a - b);
-      
-      // Try to fit in 2-3 pages by scaling if needed
+
       const totalPages = Math.ceil(imgHeight / pageContentHeight);
-      let scale = 1;
-      
-      // If more than 3 pages, try to compress
+      let fitScale = 1;
       if (totalPages > 3) {
-        scale = (3 * pageContentHeight) / imgHeight;
-        // Don't scale below 0.65 to maintain readability
-        scale = Math.max(scale, 0.65);
+        fitScale = (3 * pageContentHeight) / imgHeight;
+        fitScale = Math.max(fitScale, 0.65);
       }
 
-      const scaledWidth = imgWidth * scale;
-      const scaledHeight = imgHeight * scale;
-      const scaledContentHeight = pageContentHeight;
-      
+      const scaledWidth = imgWidth * fitScale;
+      const scaledHeight = imgHeight * fitScale;
+
       let yPosition = 0;
       let pageNumber = 0;
       const usedBreakPoints: number[] = [];
 
       while (yPosition < scaledHeight) {
-        if (pageNumber > 0) {
-          pdf.addPage();
-        }
+        if (pageNumber > 0) pdf.addPage();
 
-        // Calculate the ideal next break point
-        let nextYPosition = yPosition + scaledContentHeight;
-        
-        // If not the last page, try to find a good section break point
+        let nextYPosition = yPosition + pageContentHeight;
+
         if (nextYPosition < scaledHeight) {
-          // Find section break points within a reasonable range of the ideal break
-          const searchRangeStart = (nextYPosition - 40) / scale; // 40mm before ideal
-          const searchRangeEnd = (nextYPosition + 10) / scale;   // 10mm after ideal
-          
-          const candidateBreaks = sectionBreakPoints.filter(bp => 
-            bp > searchRangeStart && 
-            bp < searchRangeEnd && 
-            bp * scale > yPosition + 50 && // At least 50mm of content
+          // Search backward up to 60mm to find a clean break between items
+          const searchRangeStart = (nextYPosition - 60) / fitScale;
+          const searchRangeEnd = (nextYPosition + 5) / fitScale;
+          const candidateBreaks = sectionBreakPoints.filter(bp =>
+            bp > searchRangeStart &&
+            bp < searchRangeEnd &&
+            bp * fitScale > yPosition + 30 &&
             !usedBreakPoints.includes(bp)
           );
-          
           if (candidateBreaks.length > 0) {
-            // Use the break point closest to the ideal position
-            const bestBreak = candidateBreaks.reduce((prev, curr) => 
-              Math.abs(curr * scale - nextYPosition) < Math.abs(prev * scale - nextYPosition) ? curr : prev
+            const bestBreak = candidateBreaks.reduce((prev, curr) =>
+              Math.abs(curr * fitScale - nextYPosition) < Math.abs(prev * fitScale - nextYPosition) ? curr : prev
             );
-            nextYPosition = bestBreak * scale;
+            nextYPosition = bestBreak * fitScale;
             usedBreakPoints.push(bestBreak);
           }
         }
-        
-        // Ensure we don't exceed the total height
+
         nextYPosition = Math.min(nextYPosition, scaledHeight);
-        
-        const sourceY = yPosition / scale;
-        const sourceHeight = (nextYPosition - yPosition) / scale;
-        
-        // Create a temporary canvas for this page section
+
+        const sourceY = yPosition / fitScale;
+        const sourceHeight = (nextYPosition - yPosition) / fitScale;
+
         const pageCanvas = document.createElement('canvas');
         const pageContext = pageCanvas.getContext('2d');
-        
+
         const sourceWidthPx = canvas.width;
         const sourceHeightPx = (sourceHeight / imgHeight) * canvas.height;
         const sourceYPx = (sourceY / imgHeight) * canvas.height;
-        
+
         pageCanvas.width = sourceWidthPx;
         pageCanvas.height = sourceHeightPx;
-        
+
         if (pageContext) {
           pageContext.drawImage(
             canvas,
@@ -287,27 +319,40 @@ function App() {
             0, 0,
             sourceWidthPx, sourceHeightPx
           );
-          
-          // Use JPEG with compression instead of PNG for much smaller file size
-          const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.85); // 0.85 quality provides good balance
-          const displayHeight = sourceHeight * scale;
-          
+
+          const pageImgData = pageCanvas.toDataURL('image/png');
+          const displayHeight = sourceHeight * fitScale;
+
           pdf.addImage(
             pageImgData,
-            'JPEG',
+            'PNG',
             margin,
             margin,
             scaledWidth,
-            displayHeight,
-            undefined,
-            'FAST' // Use FAST compression for smaller file size
+            displayHeight
           );
+
+          // Overlay clickable link annotations for this page
+          const pageTopMm = yPosition / fitScale;
+          const pageBottomMm = (nextYPosition) / fitScale;
+
+          for (const link of linkData) {
+            const linkTopMm = link.top * pxToMmY;
+            const linkBottomMm = (link.top + link.height) * pxToMmY;
+
+            if (linkBottomMm < pageTopMm || linkTopMm > pageBottomMm) continue;
+
+            const x = margin + link.left * pxToMmX * fitScale;
+            const y = margin + (linkTopMm - pageTopMm) * fitScale;
+            const w = link.width * pxToMmX * fitScale;
+            const h = link.height * pxToMmY * fitScale;
+
+            pdf.link(x, y, w, h, { url: link.href });
+          }
         }
 
         yPosition = nextYPosition;
         pageNumber++;
-        
-        // Safety limit
         if (pageNumber >= 5) break;
       }
 
